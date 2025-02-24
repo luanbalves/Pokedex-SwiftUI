@@ -9,6 +9,7 @@ import SwiftUI
 
 protocol PokemonListViewModeling: ObservableObject {
     var pokemons: [Pokemon]? { get }
+    func goToPokemonDetails(id: Int) -> AnyView
 }
 
 class PokemonListViewModel: PokemonListViewModeling {
@@ -44,6 +45,10 @@ class PokemonListViewModel: PokemonListViewModeling {
                 print(failure)
             }
         }
+    }
+    
+    func goToPokemonDetails(id: Int) -> AnyView {
+        .init(coordinator.pushPokemonDetails(id: id))
     }
 }
 

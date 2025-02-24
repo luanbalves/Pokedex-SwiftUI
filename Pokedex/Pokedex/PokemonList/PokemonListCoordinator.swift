@@ -8,12 +8,12 @@
 import SwiftUI
 
 protocol PokemonListInterface: AnyObject {
-//    func pushPokemonDetail(pokemon: Pokemon) -> AnyView
+    func pushPokemonDetails(id: Int) -> AnyView
 }
 
 class PokemonListCoordinator: PokemonListInterface {
-//    func pushPokemonDetails(pokemon: Pokemon) -> AnyView {
-//        let pokemonDetailsScreen = PokemonDetailsFactory.makeModule(pokemon: Pokemon)
-//        return AnyView(pokemonDetailsScreen)
-//    }
+    func pushPokemonDetails(id: Int) -> AnyView {
+        let pokemonDetailsScreen = PokemonDetailsFactory.makeModule(id: id)
+        return AnyView(pokemonDetailsScreen)
+    }
 }

@@ -24,7 +24,7 @@ extension Endpoint {
     }
 
     var host: String {
-        return "pokeapi.co"
+        return ApiUrls.baseUrl
     }
     
     var queryItems: [URLQueryItem]? {
