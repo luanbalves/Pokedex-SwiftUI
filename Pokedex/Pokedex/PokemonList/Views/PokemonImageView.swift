@@ -19,6 +19,8 @@ struct PokemonImageView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
+                    .background(Color(image.dominantColor ?? .clear))
+                    .cornerRadius(10)
             } else {
                 self.placeholder
                     .onAppear {

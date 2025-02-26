@@ -18,29 +18,7 @@ struct PokemonListScreen<VM>: View where VM: PokemonListViewModeling {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LazyVStack {
-                    if let pokemons = viewModel.pokemons {
-                        ForEach(pokemons, id: \.id) { pokemon in
-                            
-                            let imageUrl = URL(string: "\(ApiUrls.imageUrl)\(pokemon.id ?? 0).png")
-                            
-                            VStack {
-                                PokemonImageView(
-                                    url: imageUrl,
-                                    placeholder: Image(systemName: "photo")
-                                )
-                                Text(pokemon.name)
-                                Text("\(pokemon.id ?? 1)")
-                                Text(pokemon.url)
-                            }
-                            .onTapGesture {
-                                selectedPokemonId = pokemon.id
-                            }
-                        }
-                    } else {
-                        ProgressView()
-                    }
-                }
+                PokemonGridView(viewModel.pokemons, $selectedPokemonId)
             }
             .navigationDestination(item: $selectedPokemonId) { id in
                 viewModel.goToPokemonDetails(id: id)
