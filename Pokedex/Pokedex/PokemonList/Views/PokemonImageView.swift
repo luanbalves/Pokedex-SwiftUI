@@ -10,16 +10,25 @@ import SwiftUI
 struct PokemonImageView: View {
     let url: URL?
     let placeholder: Image
-    
+
     @State private var image: UIImage?
-    
+    @Binding var dominantColor: Color
+
     var body: some View {
         Group {
             if let image = image {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .background(Color(image.dominantColor ?? .clear))
+                    .background(
+                        GeometryReader { _ in
+                            Color.clear
+                                .task(id: image) {
+                                    let uiColor = image.dominantColor ?? .clear
+                                    self.dominantColor = Color(uiColor)
+                                }
+                        }
+                    )
                     .cornerRadius(10)
             } else {
                 self.placeholder
@@ -29,15 +38,15 @@ struct PokemonImageView: View {
             }
         }
     }
-    
+
     private func loadImage() {
         guard let url = url else { return }
-        
+
         if let cachedImage = ImageCache.getImage(forKey: url.absoluteString) {
             self.image = cachedImage
             return
         }
-        
+
         Task {
             do {
                 let (data, _) = try await URLSession.shared.data(from: url)

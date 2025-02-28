@@ -9,30 +9,29 @@ import SwiftUI
 
 struct PokemonDetailsScreen<VM>: View where VM: PokemonDetailsViewModeling {
     @ObservedObject private var viewModel: VM
-    
+
     init(viewModel: VM) {
         self.viewModel = viewModel
     }
-    
+
     var body: some View {
         VStack {
             if let pokemon = viewModel.pokemon {
-                Text(pokemon.name)
-                Text(pokemon.height.description)
-                Text(pokemon.weight.description)
-                Text(pokemon.baseExperience.description)
-                Text(pokemon.types[0].type.name)
-                if pokemon.types.count > 1 {
-                    Text(pokemon.types[1].type.name)
+                VStack(spacing: 0) {
+                    PokemonBackgroundView(pokemonId: pokemon.id)
+                    PokemonInfosView(pokemon: pokemon)
+                    Spacer()
                 }
-                
             } else {
                 ProgressView()
             }
         }
+        .ignoresSafeArea(.all, edges: .top)
+        .toolbar(.hidden)
+        .statusBarHidden()
     }
 }
 
 #Preview {
-    PokemonDetailsFactory.makeModule(id: 1)
+    PokemonDetailsFactory.makeModule(id: 3)
 }

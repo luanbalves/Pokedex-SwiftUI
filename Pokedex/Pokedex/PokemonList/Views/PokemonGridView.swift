@@ -14,19 +14,20 @@ struct PokemonGridView: View {
     ]
     var pokemons: [Pokemon]?
     @Binding var selectedPokemonId: Int?
-    
+
     init(_ pokemons: [Pokemon]?, _ selectedPokemonId: Binding<Int?>) {
         self.pokemons = pokemons
         self._selectedPokemonId = selectedPokemonId
     }
+
     var body: some View {
         LazyVGrid(columns: columns, spacing: 10) {
             if let pokemons = pokemons {
                 ForEach(pokemons, id: \.id) { pokemon in
                     PokemonCardView(pokemon)
-                    .onTapGesture {
-                        selectedPokemonId = pokemon.id
-                    }
+                        .onTapGesture {
+                            selectedPokemonId = pokemon.id
+                        }
                 }
             } else {
                 ProgressView()
@@ -38,23 +39,28 @@ struct PokemonGridView: View {
 
 private struct PokemonCardView: View {
     let pokemon: Pokemon
-    
+    @State private var dominantColor: Color = .clear
+
     init(_ pokemon: Pokemon) {
         self.pokemon = pokemon
     }
-    
+
     var body: some View {
         VStack {
             let imageUrl = URL(string: "\(ApiUrls.imageUrl)\(pokemon.id ?? 0).png")
 
             PokemonImageView(
                 url: imageUrl,
-                placeholder: Image(systemName: "photo")
+                placeholder: Image(systemName: "photo"),
+                dominantColor: $dominantColor
             )
+            .background(dominantColor)
+            .cornerRadius(10)
+
             Text(pokemon.name.capitalized)
                 .font(.headline)
                 .foregroundStyle(.black)
-            
+
             Text("#\(String(format: "%04d", pokemon.id ?? 1))")
                 .font(.subheadline)
                 .foregroundStyle(.gray)
