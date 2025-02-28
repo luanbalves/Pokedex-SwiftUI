@@ -7,11 +7,8 @@
 
 import SwiftUI
 
-struct PokemonListFactory {
+enum PokemonListFactory {
     static func makeModule() -> some View {
-        let service = PokemonService()
-        let coordinator = PokemonListCoordinator()
-        let viewModel = PokemonListViewModel(service: service, coordinator: coordinator)
-        return PokemonListScreen(viewModel: viewModel)
+        PokemonListCoordinator().makeView()
     }
 }

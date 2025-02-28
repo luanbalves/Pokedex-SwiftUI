@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PokemonDetailsFactory {
+enum PokemonDetailsFactory {
     static func makeModule(id: Int) -> some View {
         let service = PokemonService()
         let viewModel = PokemonDetailsViewModel(service: service, id: id)

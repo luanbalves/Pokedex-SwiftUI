@@ -9,17 +9,16 @@ import SwiftUI
 
 protocol PokemonListViewModeling: ObservableObject {
     var pokemons: [Pokemon]? { get }
-    func goToPokemonDetails(id: Int) -> AnyView
+    func selectPokemon(_ pokemon: Pokemon)
 }
 
 class PokemonListViewModel: PokemonListViewModeling {
     private let service: PokemonListServiceable
-    private var coordinator: any PokemonListInterface
     @Published var pokemons: [Pokemon]?
-
-    init(service: PokemonListServiceable, coordinator: any PokemonListInterface) {
+    var onPokemonSelected: (Pokemon) -> Void = { _ in}
+    
+    init(service: PokemonListServiceable) {
         self.service = service
-        self.coordinator = coordinator
         getAllPokemon(offset: nil, limit: nil)
     }
     
@@ -47,8 +46,8 @@ class PokemonListViewModel: PokemonListViewModeling {
         }
     }
     
-    func goToPokemonDetails(id: Int) -> AnyView {
-        .init(coordinator.pushPokemonDetails(id: id))
+    func selectPokemon(_ pokemon: Pokemon) {
+        onPokemonSelected(pokemon)
     }
 }
 

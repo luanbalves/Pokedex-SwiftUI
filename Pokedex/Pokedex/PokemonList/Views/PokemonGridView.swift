@@ -13,11 +13,11 @@ struct PokemonGridView: View {
         GridItem(.flexible(), spacing: 10)
     ]
     var pokemons: [Pokemon]?
-    @Binding var selectedPokemonId: Int?
+    let onSelect: (Pokemon) -> Void
 
-    init(_ pokemons: [Pokemon]?, _ selectedPokemonId: Binding<Int?>) {
+    init(_ pokemons: [Pokemon]?, onSelect: @escaping (Pokemon) -> Void) {
         self.pokemons = pokemons
-        self._selectedPokemonId = selectedPokemonId
+        self.onSelect = onSelect
     }
 
     var body: some View {
@@ -26,7 +26,7 @@ struct PokemonGridView: View {
                 ForEach(pokemons, id: \.id) { pokemon in
                     PokemonCardView(pokemon)
                         .onTapGesture {
-                            selectedPokemonId = pokemon.id
+                            onSelect(pokemon)
                         }
                 }
             } else {
