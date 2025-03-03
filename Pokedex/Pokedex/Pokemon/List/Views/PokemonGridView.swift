@@ -47,10 +47,8 @@ private struct PokemonCardView: View {
 
     var body: some View {
         VStack {
-            let imageUrl = URL(string: "\(ApiUrls.imageUrl)\(pokemon.id ?? 0).png")
-
             PokemonImageView(
-                url: imageUrl,
+                pokemonId: pokemon.id,
                 placeholder: Image(systemName: "photo"),
                 dominantColor: $dominantColor
             )

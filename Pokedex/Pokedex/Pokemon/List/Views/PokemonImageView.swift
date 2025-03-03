@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PokemonImageView: View {
-    let url: URL?
+    let pokemonId: Int?
     let placeholder: Image
 
     @State private var image: UIImage?
@@ -40,7 +40,7 @@ struct PokemonImageView: View {
     }
 
     private func loadImage() {
-        guard let url = url else { return }
+        guard let url = URL(string: "\(ApiUrls.imageUrl)\(pokemonId ?? 1).png") else { return }
 
         if let cachedImage = ImageCache.getImage(forKey: url.absoluteString) {
             self.image = cachedImage

@@ -14,7 +14,7 @@ protocol PokemonDetailsViewModeling: ObservableObject {
 class PokemonDetailsViewModel: PokemonDetailsViewModeling {
     private let service: PokemonDetailsServiceable
     @Published var pokemon: PokemonDetail?
-    var id: Int
+    let id: Int
     
     init(service: PokemonDetailsServiceable, id: Int) {
         self.service = service

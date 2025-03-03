@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct PokemonInfosView: View {
-    let pokemon: PokemonDetail?
+    let pokemon: PokemonDetail
+    
+    init(_ pokemon: PokemonDetail) {
+        self.pokemon = pokemon
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(pokemon?.name.capitalized ?? "")
+            Text(pokemon.name.capitalized)
                 .font(.largeTitle)
                 .padding(.top, 20)
 
@@ -31,9 +35,9 @@ struct PokemonInfosView: View {
                 .font(.title2)
                 .bold()
 
-            InfoRow(label: "Altura", value: "\(pokemon?.height ?? 0) dm")
-            InfoRow(label: "Peso", value: "\(pokemon?.weight ?? 0) hg")
-            InfoRow(label: "Experiência", value: "\(pokemon?.baseExperience ?? 0)")
+            InfoRow(label: "Altura", value: "\(pokemon.height) dm")
+            InfoRow(label: "Peso", value: "\(pokemon.weight) hg")
+            InfoRow(label: "Experiência", value: "\(pokemon.baseExperience)")
         }
     }
 
@@ -44,7 +48,7 @@ struct PokemonInfosView: View {
                 .bold()
 
             HStack(spacing: 12) {
-                ForEach(pokemon?.types ?? [], id: \.type.name) { pokemonType in
+                ForEach(pokemon.types, id: \.type.name) { pokemonType in
                     Text(pokemonType.type.name.capitalized)
                         .typeCapsule(type: pokemonType.type)
                 }

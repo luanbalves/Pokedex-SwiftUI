@@ -9,20 +9,18 @@ import SwiftUI
 
 protocol PokemonListViewModeling: ObservableObject {
     var pokemons: [Pokemon]? { get }
-    func selectPokemon(_ pokemon: Pokemon)
 }
 
 class PokemonListViewModel: PokemonListViewModeling {
     private let service: PokemonListServiceable
     @Published var pokemons: [Pokemon]?
-    var onPokemonSelected: (Pokemon) -> Void = { _ in}
     
     init(service: PokemonListServiceable) {
         self.service = service
         getAllPokemon(offset: nil, limit: nil)
     }
     
-    func updatePokemonsId(_ pokemons: [Pokemon]) {
+    private func updatePokemonsId(_ pokemons: [Pokemon]) {
         self.pokemons = pokemons.map { pokemon in
             var updatedPokemon = pokemon
             if let idString = Extracters.extractPokemonId(from: pokemon.url),
@@ -33,7 +31,7 @@ class PokemonListViewModel: PokemonListViewModeling {
         }
     }
     
-    func getAllPokemon(offset: Int?, limit: Int?) {
+    private func getAllPokemon(offset: Int?, limit: Int?) {
         Task { @MainActor in
             let result = await service.getAllPokemons(offset: offset, limit: limit)
             
@@ -44,10 +42,6 @@ class PokemonListViewModel: PokemonListViewModeling {
                 print(failure)
             }
         }
-    }
-    
-    func selectPokemon(_ pokemon: Pokemon) {
-        onPokemonSelected(pokemon)
     }
 }
 

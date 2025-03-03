@@ -11,16 +11,18 @@ struct PokemonBackgroundView: View {
     @State private var dominantColor: Color = .clear
     let pokemonId: Int
     @Environment(\.dismiss) var dismiss
-
+    
+    init(_ pokemonId: Int) {
+        self.pokemonId = pokemonId
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
             self.dominantColor.frame(height: UIScreen.main.bounds.height * 0.35)
 
-            let imageUrl = URL(string: "\(ApiUrls.imageUrl)\(pokemonId).png")
-
             PokemonImageView(
-                url: imageUrl,
-                placeholder: Image(systemName: "photo"),
+                pokemonId: pokemonId,
+                placeholder: Image(systemName: "exclamationmark.triangle.fill"),
                 dominantColor: self.$dominantColor
             )
             .frame(width: 200, height: 200)
@@ -36,7 +38,7 @@ struct PokemonBackgroundView: View {
         }
     }
 
-    private var closeButton: some View {
+    fileprivate var closeButton: some View {
         Button {
             dismiss()
         } label: {

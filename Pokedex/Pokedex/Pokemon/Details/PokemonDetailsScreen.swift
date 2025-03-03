@@ -18,8 +18,8 @@ struct PokemonDetailsScreen<VM>: View where VM: PokemonDetailsViewModeling {
         VStack {
             if let pokemon = viewModel.pokemon {
                 VStack(spacing: 0) {
-                    PokemonBackgroundView(pokemonId: pokemon.id)
-                    PokemonInfosView(pokemon: pokemon)
+                    PokemonBackgroundView(pokemon.id)
+                    PokemonInfosView(pokemon)
                     Spacer()
                 }
             } else {
@@ -33,5 +33,5 @@ struct PokemonDetailsScreen<VM>: View where VM: PokemonDetailsViewModeling {
 }
 
 #Preview {
-    PokemonDetailsFactory.makeModule(id: 3)
+    PokemonDetailsScreen(viewModel: PokemonDetailsViewModel(service: PokemonService(), id: 3))
 }
