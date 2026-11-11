@@ -24,7 +24,7 @@ enum PokemonImageStyle: String {
 struct PokemonImageView: View {
     let pokemonId: Int
     let style: PokemonImageStyle
-    var dominantColor: Binding<Color>? = nil
+    var dominantColor: Binding<Color>?
 
     @State private var image: UIImage?
 

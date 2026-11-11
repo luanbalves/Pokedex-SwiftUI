@@ -14,7 +14,26 @@ struct PokemonDetail: Decodable, Identifiable {
     var height: Int
     var weight: Int
     var types: [PokemonTypes]
-    
+    var stats: [PokemonStats]
+
+    init(
+        id: Int,
+        name: String,
+        baseExperience: Int,
+        height: Int,
+        weight: Int,
+        types: [PokemonTypes],
+        stats: [PokemonStats] = []
+    ) {
+        self.id = id
+        self.name = name
+        self.baseExperience = baseExperience
+        self.height = height
+        self.weight = weight
+        self.types = types
+        self.stats = stats
+    }
+
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -22,6 +41,7 @@ struct PokemonDetail: Decodable, Identifiable {
         case height
         case weight
         case types
+        case stats
     }
 }
 
@@ -33,10 +53,24 @@ struct PokemonTypes: Decodable {
 struct PokemonType: Decodable {
     var name: String
     var url: String
-    
+
     var typeEnum: PokemonTypeEnum {
         PokemonTypeEnum(rawValue: name)
     }
+}
+
+struct PokemonStats: Decodable {
+    var baseStat: Int
+    var stat: StatInfo
+
+    enum CodingKeys: String, CodingKey {
+        case baseStat = "base_stat"
+        case stat
+    }
+}
+
+struct StatInfo: Decodable {
+    var name: String
 }
 
 extension PokemonType {
@@ -44,7 +78,7 @@ extension PokemonType {
         case fire, water, grass, electric, psychic, poison, ground
         case flying, bug, normal, fighting, rock, ghost, ice
         case dragon, dark, steel, fairy, unknown
-        
+
         var color: Color {
             switch self {
             case .fire: return .orange
@@ -68,7 +102,7 @@ extension PokemonType {
             case .unknown: return .gray
             }
         }
-        
+
         init(rawValue: String) {
             let lowercased = rawValue.lowercased()
             self = PokemonTypeEnum.allCases.first { $0.rawValue == lowercased } ?? .unknown

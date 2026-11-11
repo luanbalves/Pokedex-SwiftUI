@@ -20,6 +20,7 @@ struct PokedexApp: App {
                     }
             }
             .environment(router)
+            .modelContainer(for: FavoritePokemon.self)
         }
     }
 }

@@ -13,6 +13,7 @@ enum PokemonRoute: Hashable {
 }
 
 enum PokemonFeatureRouter {
+    @MainActor
     @ViewBuilder
     static func view(
         for route: PokemonRoute,

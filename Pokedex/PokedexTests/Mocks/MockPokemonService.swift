@@ -7,6 +7,7 @@
 
 @testable import Pokedex
 
+@MainActor
 final class MockPokemonService: PokemonListServiceable, PokemonDetailsServiceable {
     var listHandler: ((Int?, Int?) async throws -> PokemonsResponse)?
     var detailHandler: ((Int) async throws -> PokemonDetail)?

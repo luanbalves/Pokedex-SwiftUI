@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 struct PokemonDetailsScreen: View {
     @State private var viewModel: PokemonDetailsViewModel
 

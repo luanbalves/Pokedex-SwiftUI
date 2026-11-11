@@ -23,7 +23,7 @@ struct ErrorStateView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
 
-            Button("Tentar novamente", action: retryAction)
+            Button("common.retry", action: retryAction)
                 .buttonStyle(.borderedProminent)
         }
         .padding(24)

@@ -19,18 +19,12 @@ enum RequestError: Error, Equatable {
 extension RequestError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .decode:
-            "Não foi possível processar os dados recebidos."
-        case .invalidURL:
-            "Endereço inválido."
-        case .noResponse:
-            "O servidor não respondeu. Tente novamente."
-        case .unauthorized:
-            "Sessão expirada."
-        case .unexpectedStatusCode:
-            "Algo deu errado no servidor. Tente novamente."
-        case .unknown:
-            "Erro inesperado. Tente novamente."
+        case .decode: String(localized: "error.decode")
+        case .invalidURL: String(localized: "error.invalidURL")
+        case .noResponse: String(localized: "error.noResponse")
+        case .unauthorized: String(localized: "error.unauthorized")
+        case .unexpectedStatusCode: String(localized: "error.unexpectedStatusCode")
+        case .unknown: String(localized: "error.unknown")
         }
     }
 }

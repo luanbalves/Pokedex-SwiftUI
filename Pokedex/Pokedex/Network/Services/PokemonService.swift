@@ -5,11 +5,11 @@
 //  Created by Luan Alves Barroso on 20/02/25.
 //
 
-protocol PokemonListServiceable {
+protocol PokemonListServiceable: Sendable {
     func getAllPokemons(offset: Int?, limit: Int?) async throws -> PokemonsResponse
 }
 
-protocol PokemonDetailsServiceable {
+protocol PokemonDetailsServiceable: Sendable {
     func getPokemonDetails(id: Int) async throws -> PokemonDetail
 }
 

@@ -9,41 +9,56 @@ import SwiftUI
 
 struct PokemonInfosView: View {
     let pokemon: PokemonDetail
-    
+
     init(_ pokemon: PokemonDetail) {
         self.pokemon = pokemon
     }
-    
+
+    private var typeColor: Color {
+        pokemon.types.first?.type.typeEnum.color ?? .blue
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(pokemon.name.capitalized)
                 .font(.largeTitle)
                 .padding(.top, 20)
 
-            statsSection
+            infoSection
             typesSection
+            statsSection
         }
         .padding(.horizontal, 20)
+        .padding(.bottom, 24)
         .background(Color(.systemBackground))
         .cornerRadius(20)
         .offset(y: -40)
     }
-    
-    private var statsSection: some View {
+
+    private var infoSection: some View {
         Group {
-            Text("Detalhes")
+            Text("details.info")
                 .font(.title2)
                 .bold()
 
-            InfoRow(label: "Altura", value: "\(pokemon.height) dm")
-            InfoRow(label: "Peso", value: "\(pokemon.weight) hg")
-            InfoRow(label: "Experiência", value: "\(pokemon.baseExperience)")
+            InfoRow(label: String(localized: "details.height"), value: meters)
+            InfoRow(label: String(localized: "details.weight"), value: kilograms)
+            InfoRow(label: String(localized: "details.experience"), value: "\(pokemon.baseExperience)")
         }
+    }
+
+    /// A API retorna altura em decímetros e peso em hectogramas.
+    private var meters: String {
+        String(format: "%.1f m", Double(pokemon.height) / 10)
+    }
+
+    private var kilograms: String {
+        String(format: "%.1f kg", Double(pokemon.weight) / 10)
     }
 
     private var typesSection: some View {
         Group {
-            Text("Tipos")
+            Text("details.types")
                 .font(.title2)
                 .bold()
 
@@ -55,6 +70,34 @@ struct PokemonInfosView: View {
             }
         }
     }
+
+    private var statsSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("details.stats")
+                .font(.title2)
+                .bold()
+
+            ForEach(pokemon.stats, id: \.stat.name) { stat in
+                StatBar(
+                    label: Self.label(for: stat.stat.name),
+                    value: stat.baseStat,
+                    color: typeColor
+                )
+            }
+        }
+    }
+
+    private static func label(for rawStatName: String) -> String {
+        switch rawStatName {
+        case "hp": String(localized: "stats.hp")
+        case "attack": String(localized: "stats.attack")
+        case "defense": String(localized: "stats.defense")
+        case "special-attack": String(localized: "stats.specialAttack")
+        case "special-defense": String(localized: "stats.specialDefense")
+        case "speed": String(localized: "stats.speed")
+        default: rawStatName.capitalized
+        }
+    }
 }
 
 private struct InfoRow: View {
@@ -63,38 +106,46 @@ private struct InfoRow: View {
 
     var body: some View {
         HStack {
-            Text(self.label)
-                .foregroundColor(.secondary)
+            Text(label)
+                .foregroundStyle(.secondary)
             Spacer()
-            Text(self.value)
+            Text(value)
                 .fontWeight(.semibold)
         }
         .padding(.vertical, 4)
     }
 }
 
-protocol TypeColorProviding {
-    func color(for type: PokemonType) -> Color
-}
+/// Barra de atributo com escala máxima de 255 (maior base_stat da Pokédex).
+private struct StatBar: View {
+    let label: String
+    let value: Int
+    let color: Color
 
-struct TypeColorProvider: TypeColorProviding {
-    func color(for type: PokemonType) -> Color {
-        type.typeEnum.color
-    }
-}
+    private static let maxValue: CGFloat = 255
 
-struct TypeCapsuleModifier: ViewModifier {
-    let type: PokemonType
-    let colorProvider: TypeColorProviding
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(label)
+                .font(.subheadline)
+                .frame(width: 116, alignment: .leading)
 
-    func body(content: Content) -> some View {
-        content
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Capsule().fill(colorProvider.color(for: type)))
-            .font(.footnote)
-            .foregroundColor(.white)
-            .bold()
-            .shadow(color: colorProvider.color(for: type).opacity(0.4), radius: 3)
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(.quaternary)
+                    Capsule()
+                        .fill(color)
+                        .frame(width: geometry.size.width * min(CGFloat(value) / Self.maxValue, 1))
+                }
+            }
+            .frame(height: 10)
+
+            Text("\(value)")
+                .font(.subheadline.monospacedDigit())
+                .frame(width: 32, alignment: .trailing)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
