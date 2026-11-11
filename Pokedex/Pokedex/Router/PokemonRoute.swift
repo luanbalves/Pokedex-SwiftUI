@@ -12,22 +12,21 @@ enum PokemonRoute: Hashable {
     case details(Int)
 }
 
-struct PokemonFeatureRouter {
+enum PokemonFeatureRouter {
     @ViewBuilder
     static func view(
         for route: PokemonRoute,
-        router: AppRouter
+        dependencies: AppDependencies
     ) -> some View {
         switch route {
         case .list:
-            let factory = DefaultPokemonListModule()
-            let service = router.dependencies.makePokemonListService()
-            PokemonListModule(factory: factory, service: service)
-            
+            PokemonListScreen(service: dependencies.makePokemonListService())
+
         case .details(let pokemonId):
-            let service = router.dependencies.makePokemonDetailsService()
-            let factory = DefaultPokemonDetailsModule()
-            PokemonDetailsModule(factory: factory, service: service, pokemonId: pokemonId)
+            PokemonDetailsScreen(
+                service: dependencies.makePokemonDetailsService(),
+                pokemonId: pokemonId
+            )
         }
     }
 }

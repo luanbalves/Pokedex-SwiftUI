@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-struct PokemonDetailsScreen<VM>: View where VM: PokemonDetailsViewModeling {
-    @ObservedObject private var viewModel: VM
+struct PokemonDetailsScreen: View {
+    @State private var viewModel: PokemonDetailsViewModel
 
-    init(viewModel: VM) {
-        self.viewModel = viewModel
+    init(service: PokemonDetailsServiceable, pokemonId: Int) {
+        _viewModel = State(initialValue: PokemonDetailsViewModel(service: service, pokemonId: pokemonId))
     }
 
     var body: some View {
@@ -22,16 +22,29 @@ struct PokemonDetailsScreen<VM>: View where VM: PokemonDetailsViewModeling {
                     PokemonInfosView(pokemon)
                     Spacer()
                 }
+            } else if let error = viewModel.error {
+                ErrorStateView(error: error) {
+                    Task { await reload() }
+                }
             } else {
                 ProgressView()
             }
         }
+        .frame(maxWidth: .infinity)
         .ignoresSafeArea(.all, edges: .top)
         .toolbar(.hidden)
         .statusBarHidden()
+        .task {
+            await viewModel.load()
+        }
+    }
+
+    private func reload() async {
+        await viewModel.reset()
+        await viewModel.load()
     }
 }
 
 #Preview {
-    PokemonDetailsScreen(viewModel: PokemonDetailsViewModel(service: PokemonService(), id: 3))
+    PokemonDetailsScreen(service: PokemonService(), pokemonId: 3)
 }

@@ -22,7 +22,7 @@ struct PokemonBackgroundView: View {
 
             PokemonImageView(
                 pokemonId: pokemonId,
-                placeholder: Image(systemName: "exclamationmark.triangle.fill"),
+                style: .artwork,
                 dominantColor: self.$dominantColor
             )
             .frame(width: 200, height: 200)

@@ -7,58 +7,72 @@
 
 import SwiftUI
 
+enum PokemonImageStyle: String {
+    /// Sprite pequeno, usado no grid da lista.
+    case sprite
+    /// Artwork oficial em alta resolução, usado nos detalhes.
+    case artwork
+
+    var baseURL: String {
+        switch self {
+        case .sprite: ApiUrls.spriteUrl
+        case .artwork: ApiUrls.artworkUrl
+        }
+    }
+}
+
 struct PokemonImageView: View {
-    let pokemonId: Int?
-    let placeholder: Image
+    let pokemonId: Int
+    let style: PokemonImageStyle
+    var dominantColor: Binding<Color>? = nil
 
     @State private var image: UIImage?
-    @Binding var dominantColor: Color
 
     var body: some View {
         Group {
-            if let image = image {
+            if let image {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .background(
-                        GeometryReader { _ in
-                            Color.clear
-                                .task(id: image) {
-                                    let uiColor = image.dominantColor ?? .clear
-                                    self.dominantColor = Color(uiColor)
-                                }
-                        }
-                    )
-                    .cornerRadius(10)
             } else {
-                self.placeholder
-                    .onAppear {
-                        self.loadImage()
-                    }
+                Image(systemName: "photo")
+                    .foregroundStyle(.tertiary)
             }
+        }
+        .task(id: "\(style.rawValue)-\(pokemonId)") {
+            await loadImage()
         }
     }
 
-    private func loadImage() {
-        guard let url = URL(string: "\(ApiUrls.imageUrl)\(pokemonId ?? 1).png") else { return }
-
-        if let cachedImage = ImageCache.getImage(forKey: url.absoluteString) {
-            self.image = cachedImage
+    private func loadImage() async {
+        if let cached = PokemonImageCache.shared.image(forKey: cacheKey) {
+            image = cached
+            updateDominantColor(of: cached)
             return
         }
 
-        Task {
-            do {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                if let downloadedImage = UIImage(data: data) {
-                    ImageCache.setImage(downloadedImage, forKey: url.absoluteString)
-                    DispatchQueue.main.async {
-                        self.image = downloadedImage
-                    }
-                }
-            } catch {
-                print("Error downloading image: \(error.localizedDescription)")
-            }
+        guard let url = URL(string: cacheKey) else { return }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let downloadedImage = UIImage(data: data) else { return }
+            PokemonImageCache.shared.setImage(downloadedImage, forKey: cacheKey)
+            image = downloadedImage
+            updateDominantColor(of: downloadedImage)
+        } catch is CancellationError {
+            // Download cancelado: ignora silenciosamente.
+        } catch {
+            // Sem imagem: mantém o placeholder.
         }
+    }
+
+    private var cacheKey: String {
+        "\(style.baseURL)\(pokemonId).png"
+    }
+
+    private func updateDominantColor(of image: UIImage) {
+        guard let binding = dominantColor else { return }
+        let uiColor = image.dominantColor ?? .clear
+        binding.wrappedValue = Color(uiColor)
     }
 }

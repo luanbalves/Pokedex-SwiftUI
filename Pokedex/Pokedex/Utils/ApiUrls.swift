@@ -5,8 +5,12 @@
 //  Created by Luan Alves Barroso on 22/02/25.
 //
 
-struct ApiUrls {
+enum ApiUrls {
     static let baseUrl = "pokeapi.co"
-    static let imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"
-}
 
+    /// Sprite pequeno, usado no grid da lista.
+    static let spriteUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"
+
+    /// Artwork oficial em alta resolução, usado na tela de detalhes.
+    static let artworkUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"
+}

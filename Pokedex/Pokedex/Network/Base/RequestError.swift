@@ -5,29 +5,32 @@
 //  Created by Luan Alves Barroso on 20/02/25.
 //
 
+import Foundation
 
-enum RequestError: Error {
+enum RequestError: Error, Equatable {
     case decode
     case invalidURL
     case noResponse
     case unauthorized
     case unexpectedStatusCode
     case unknown
-    
-    var customMessage: String {
+}
+
+extension RequestError: LocalizedError {
+    var errorDescription: String? {
         switch self {
         case .decode:
-            return "Decode error"
-        case .unauthorized:
-            return "Session expired"
+            "Não foi possível processar os dados recebidos."
         case .invalidURL:
-            return "INVALID URL"
+            "Endereço inválido."
         case .noResponse:
-            return "No response"
+            "O servidor não respondeu. Tente novamente."
+        case .unauthorized:
+            "Sessão expirada."
         case .unexpectedStatusCode:
-            return "500"
-        default:
-            return "Unknown error"
+            "Algo deu errado no servidor. Tente novamente."
+        case .unknown:
+            "Erro inesperado. Tente novamente."
         }
     }
 }

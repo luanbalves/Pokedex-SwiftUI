@@ -6,20 +6,25 @@
 //
 
 protocol PokemonListServiceable {
-    func getAllPokemons(offset: Int?, limit: Int?) async -> Result<PokemonsResponse, RequestError>
+    func getAllPokemons(offset: Int?, limit: Int?) async throws -> PokemonsResponse
 }
 
 protocol PokemonDetailsServiceable {
-    func getPokemonDetails(id: Int) async -> Result<PokemonDetail, RequestError>
+    func getPokemonDetails(id: Int) async throws -> PokemonDetail
 }
 
-struct PokemonService: PokemonListServiceable, PokemonDetailsServiceable, HTTPClient {
-    
-    func getPokemonDetails(id: Int) async -> Result<PokemonDetail, RequestError> {
-        return await sendRequest(endpoint: PokemonEndpoint.getPokemonDetails(id: id), responseModel: PokemonDetail.self)
+struct PokemonService: PokemonListServiceable, PokemonDetailsServiceable {
+    private let client: HTTPClient
+
+    init(client: HTTPClient = URLSessionHTTPClient()) {
+        self.client = client
     }
-    
-    func getAllPokemons(offset: Int?, limit: Int?) async -> Result<PokemonsResponse, RequestError> {
-        return await sendRequest(endpoint: PokemonEndpoint.getAllPokemons(offset: offset, limit: limit), responseModel: PokemonsResponse.self)
+
+    func getAllPokemons(offset: Int?, limit: Int?) async throws -> PokemonsResponse {
+        try await client.send(PokemonEndpoint.getAllPokemons(offset: offset, limit: limit))
+    }
+
+    func getPokemonDetails(id: Int) async throws -> PokemonDetail {
+        try await client.send(PokemonEndpoint.getPokemonDetails(id: id))
     }
 }

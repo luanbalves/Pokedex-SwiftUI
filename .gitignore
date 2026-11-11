@@ -66,8 +66,8 @@ playground.xcworkspace
 
 Carthage/Build/
 
-# Accio dependency management
-Dependencies/
+# Accio dependency management (deprecated — removido para não ignorar
+# a pasta Dependencies/ do código do app)
 .accio/
 
 # fastlane

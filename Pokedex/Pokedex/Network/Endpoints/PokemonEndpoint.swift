@@ -13,51 +13,35 @@ enum PokemonEndpoint {
 }
 
 extension PokemonEndpoint: Endpoint {
-    
+
     var path: String {
         switch self {
         case .getAllPokemons:
-            return "/api/v2/pokemon/"
-        case .getPokemonDetails(id: let id):
-            return "/api/v2/pokemon/\(id)"
+            "/api/v2/pokemon/"
+        case .getPokemonDetails(let id):
+            "/api/v2/pokemon/\(id)"
         }
     }
-    
+
     var method: RequestMethod {
         switch self {
         case .getAllPokemons, .getPokemonDetails:
             .get
         }
     }
-    
-    var header: [String : String]? {
-        switch self {
-        case .getAllPokemons, .getPokemonDetails:
-            return ["Content-Type": "application/json"]
-        }
-    }
-    
+
+    /// Envia `offset` **e** `limit` juntos quando presentes.
     var queryItems: [URLQueryItem]? {
         switch self {
         case .getAllPokemons(let offset, let limit):
-            if let offset = offset {
-                return [URLQueryItem(name: "offset", value: String(offset))]
+            var items: [URLQueryItem] = []
+            if let offset {
+                items.append(URLQueryItem(name: "offset", value: String(offset)))
             }
-            
-            if let limit = limit {
-                return [URLQueryItem(name: "limit", value: String(limit))]
+            if let limit {
+                items.append(URLQueryItem(name: "limit", value: String(limit)))
             }
-            
-            return nil
-        case .getPokemonDetails:
-            return nil
-        }
-    }
-    
-    var body: [String : Any]? {
-        switch self {
-        case .getAllPokemons:
-            return nil
+            return items.isEmpty ? nil : items
         case .getPokemonDetails:
             return nil
         }

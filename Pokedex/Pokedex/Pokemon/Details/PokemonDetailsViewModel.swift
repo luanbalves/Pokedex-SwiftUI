@@ -7,31 +7,37 @@
 
 import SwiftUI
 
-protocol PokemonDetailsViewModeling: ObservableObject {
-    var pokemon: PokemonDetail? { get }
-}
-
-class PokemonDetailsViewModel: PokemonDetailsViewModeling {
+@MainActor
+@Observable
+final class PokemonDetailsViewModel {
     private let service: PokemonDetailsServiceable
-    @Published var pokemon: PokemonDetail?
-    let id: Int
-    
-    init(service: PokemonDetailsServiceable, id: Int) {
-        self.service = service
-        self.id = id
-        getPokemonDetails(id: id)
-    }
-    
-    func getPokemonDetails(id: Int) {
-        Task { @MainActor in
-            let result = await service.getPokemonDetails(id: id)
+    private(set) var pokemon: PokemonDetail?
+    private(set) var error: RequestError?
 
-            switch result {
-            case .success(let success):
-                self.pokemon = success
-            case .failure(let failure):
-                print(failure.customMessage)
-            }
+    let pokemonId: Int
+
+    init(service: PokemonDetailsServiceable, pokemonId: Int) {
+        self.service = service
+        self.pokemonId = pokemonId
+    }
+
+    func reset() {
+        pokemon = nil
+        error = nil
+    }
+
+    func load() async {
+        guard pokemon == nil, error == nil else { return }
+        error = nil
+
+        do {
+            pokemon = try await service.getPokemonDetails(id: pokemonId)
+        } catch let requestError as RequestError {
+            error = requestError
+        } catch is CancellationError {
+            // Task cancelada: ignora silenciosamente.
+        } catch {
+            self.error = .unknown
         }
     }
 }

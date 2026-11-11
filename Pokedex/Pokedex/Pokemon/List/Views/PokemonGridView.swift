@@ -8,29 +8,35 @@
 import SwiftUI
 
 struct PokemonGridView: View {
-    let columns = [
+    let pokemons: [Pokemon]
+    let onLoadMore: (Pokemon) async -> Void
+    let onSelect: (Pokemon) -> Void
+
+    private let columns = [
         GridItem(.flexible(), spacing: 10),
         GridItem(.flexible(), spacing: 10)
     ]
-    var pokemons: [Pokemon]?
-    let onSelect: (Pokemon) -> Void
 
-    init(_ pokemons: [Pokemon]?, onSelect: @escaping (Pokemon) -> Void) {
+    init(
+        _ pokemons: [Pokemon],
+        onLoadMore: @escaping (Pokemon) async -> Void,
+        onSelect: @escaping (Pokemon) -> Void
+    ) {
         self.pokemons = pokemons
+        self.onLoadMore = onLoadMore
         self.onSelect = onSelect
     }
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 10) {
-            if let pokemons = pokemons {
-                ForEach(pokemons, id: \.id) { pokemon in
-                    PokemonCardView(pokemon)
-                        .onTapGesture {
-                            onSelect(pokemon)
-                        }
-                }
-            } else {
-                ProgressView()
+            ForEach(pokemons) { pokemon in
+                PokemonCardView(pokemon: pokemon)
+                    .onTapGesture {
+                        onSelect(pokemon)
+                    }
+                    .task {
+                        await onLoadMore(pokemon)
+                    }
             }
         }
         .padding()
@@ -39,33 +45,33 @@ struct PokemonGridView: View {
 
 private struct PokemonCardView: View {
     let pokemon: Pokemon
-    @State private var dominantColor: Color = .clear
 
-    init(_ pokemon: Pokemon) {
-        self.pokemon = pokemon
-    }
+    @State private var dominantColor: Color = .clear
 
     var body: some View {
         VStack {
             PokemonImageView(
                 pokemonId: pokemon.id,
-                placeholder: Image(systemName: "photo"),
+                style: .sprite,
                 dominantColor: $dominantColor
             )
             .background(dominantColor)
-            .cornerRadius(10)
+                .cornerRadius(10)
 
             Text(pokemon.name.capitalized)
                 .font(.headline)
-                .foregroundStyle(.black)
+                .foregroundStyle(.primary)
 
-            Text("#\(String(format: "%04d", pokemon.id ?? 1))")
+            Text("#\(String(format: "%04d", pokemon.id))")
                 .font(.subheadline)
-                .foregroundStyle(.gray)
+                .foregroundStyle(.secondary)
         }
         .padding()
-        .background(.white)
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(10)
-        .shadow(radius: 4)
+        .shadow(color: .black.opacity(0.08), radius: 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(pokemon.name.capitalized), número \(pokemon.id)")
+        .accessibilityAddTraits(.isButton)
     }
 }

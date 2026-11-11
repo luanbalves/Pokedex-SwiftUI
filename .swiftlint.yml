@@ -1,0 +1,35 @@
+# Configuração do SwiftLint (https://github.com/realm/SwiftLint)
+
+# Desabilita regras que geram ruído neste projeto
+disabled_rules:
+  - trailing_whitespace
+  - identifier_name
+
+# Regras opcionais que valem a pena em 2026
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+  - fatal_error_message
+  - toggle_bool
+
+line_length:
+  warning: 140
+  error: 160
+  ignores_comments: true
+
+type_body_length:
+  warning: 300
+  error: 400
+
+file_length:
+  warning: 500
+  error: 800
+
+function_body_length:
+  warning: 60
+  error: 100
+
+excluded:
+  - .git
+  - Pokedex/Pokedex.xcodeproj
+  - Pokedex/PokedexTests

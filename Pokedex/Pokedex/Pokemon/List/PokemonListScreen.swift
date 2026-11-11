@@ -7,28 +7,74 @@
 
 import SwiftUI
 
-struct PokemonListScreen<VM>: View where VM: PokemonListViewModeling {
-    @ObservedObject private var viewModel: VM
-    @EnvironmentObject var router: AppRouter
-    
-    init(viewModel: VM) {
-        self.viewModel = viewModel
+struct PokemonListScreen: View {
+    @Environment(AppRouter.self) private var router
+    @State private var viewModel: PokemonListViewModel
+
+    init(service: PokemonListServiceable) {
+        _viewModel = State(initialValue: PokemonListViewModel(service: service))
     }
-    
+
     var body: some View {
-            ScrollView {
-                PokemonGridView(
-                    viewModel.pokemons,
-                    onSelect: navigateToPokemonDetails
-                )
+        Group {
+            if viewModel.pokemons.isEmpty {
+                emptyState
+            } else {
+                listContent
             }
+        }
+        .navigationTitle("Pokédex")
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await viewModel.loadInitial()
+        }
+        .refreshable {
+            await viewModel.reload()
+        }
     }
-    
-    private func navigateToPokemonDetails(_ pokemon: Pokemon) {
-        router.navigate(to: .pokemon(.details(pokemon.id ?? 1)))
+
+    private var listContent: some View {
+        ScrollView {
+            PokemonGridView(
+                viewModel.pokemons,
+                onLoadMore: { await viewModel.loadMoreIfNeeded(current: $0) },
+                onSelect: { pokemon in
+                    router.navigate(to: .pokemon(.details(pokemon.id)))
+                }
+            )
+
+            footer
+        }
+    }
+
+    @ViewBuilder
+    private var footer: some View {
+        if viewModel.isLoading {
+            ProgressView()
+                .padding(.bottom, 16)
+        } else if let error = viewModel.error, viewModel.canLoadMore {
+            ErrorStateView(error: error) {
+                Task { await viewModel.loadMore() }
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    @ViewBuilder
+    private var emptyState: some View {
+        if let error = viewModel.error {
+            ErrorStateView(error: error) {
+                Task { await viewModel.reload() }
+            }
+        } else {
+            ProgressView("Carregando Pokédex...")
+        }
     }
 }
 
 #Preview {
-    PokemonListScreen(viewModel: PokemonListViewModel(service: PokemonService()))
+    NavigationStack {
+        PokemonListScreen(service: PokemonService())
+            .environment(AppRouter(dependencies: LiveDependencies()))
+    }
 }

@@ -9,12 +9,8 @@ import SwiftUI
 
 @main
 struct PokedexApp: App {
-    @StateObject private var router = AppRouter(dependencies: LiveDependencies())
-    
-    init() {
-        URLProtocol.registerClass(PrintProtocol.self)
-    }
-    
+    @State private var router = AppRouter(dependencies: LiveDependencies())
+
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.navigationPath) {
@@ -23,7 +19,7 @@ struct PokedexApp: App {
                         router.view(for: route)
                     }
             }
-            .environmentObject(router)
+            .environment(router)
         }
     }
 }
