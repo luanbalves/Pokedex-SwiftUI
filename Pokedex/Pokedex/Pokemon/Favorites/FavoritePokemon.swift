@@ -17,3 +17,11 @@ final class FavoritePokemon {
         self.name = name
     }
 }
+
+extension FavoritePokemon {
+    /// Reconstrói o `Pokemon` a partir do favorito salvo, permitindo exibi-lo
+    /// mesmo que ele esteja numa página da lista que ainda não foi carregada.
+    var pokemon: Pokemon {
+        Pokemon(name: name, url: "https://pokeapi.co/api/v2/pokemon/\(id)/")
+    }
+}

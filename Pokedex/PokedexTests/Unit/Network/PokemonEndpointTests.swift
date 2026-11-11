@@ -53,4 +53,13 @@ struct PokemonEndpointTests {
         let pokemon = Pokemon(name: "desconhecido", url: "url-invalida")
         #expect(pokemon.id == 0)
     }
+
+    @Test func favoritePokemonConvertsBackToPokemon() {
+        let favorite = FavoritePokemon(id: 445, name: "garchomp")
+
+        let pokemon = favorite.pokemon
+
+        #expect(pokemon.id == 445, "O ID deve ser recuperado da URL reconstruída")
+        #expect(pokemon.name == "garchomp")
+    }
 }

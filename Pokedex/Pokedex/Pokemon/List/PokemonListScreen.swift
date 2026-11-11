@@ -26,14 +26,18 @@ struct PokemonListScreen: View {
 
     private var displayedPokemons: [Pokemon] {
         showFavoritesOnly
-            ? viewModel.pokemons.filter { favoriteIds.contains($0.id) }
+            ? favoritePokemons.map(\.pokemon).sorted { $0.id < $1.id }
             : viewModel.pokemons
     }
 
     var body: some View {
         Group {
-            if showFavoritesOnly, !viewModel.pokemons.isEmpty, displayedPokemons.isEmpty {
-                favoritesEmptyState
+            if showFavoritesOnly {
+                if favoritePokemons.isEmpty {
+                    favoritesEmptyState
+                } else {
+                    listContent
+                }
             } else if viewModel.pokemons.isEmpty {
                 emptyState
             } else {
@@ -99,7 +103,9 @@ struct PokemonListScreen: View {
 
     @ViewBuilder
     private var footer: some View {
-        if viewModel.isLoading {
+        if showFavoritesOnly {
+            // No modo favoritos a lista vem do SwiftData; nada a paginar.
+        } else if viewModel.isLoading {
             ProgressView()
                 .padding(.bottom, 16)
         } else if let error = viewModel.error, viewModel.canLoadMore {
